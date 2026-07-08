@@ -2160,6 +2160,9 @@ func (t *Task) MarkEnd(ctx context.Context, finishTime time.Time, detail *apimod
 	t.Status = detail.Status
 	t.FinishTime = finishTime
 	t.Details = *detail
+	if detail.ExecutionPlatform != "" {
+		t.ExecutionPlatform = ExecutionPlatform(detail.ExecutionPlatform)
+	}
 	t.DisplayStatusCache = t.DetermineDisplayStatus()
 	setFields := bson.M{
 		FinishTimeKey:         finishTime,
@@ -2169,6 +2172,7 @@ func (t *Task) MarkEnd(ctx context.Context, finishTime time.Time, detail *apimod
 		StartTimeKey:          t.StartTime,
 		DisplayStatusCacheKey: t.DisplayStatusCache,
 		TaskOutputInfoKey:     t.TaskOutputInfo,
+		ExecutionPlatformKey:  t.ExecutionPlatform,
 	}
 	ec2EBSSetFields(TaskCostKey, t.TaskCost, setFields)
 	return UpdateOne(ctx, bson.M{IdKey: t.Id}, bson.M{"$set": setFields})
